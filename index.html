@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pomodoro</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: #fff;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    .timer-container {
+      position: relative;
+      width: 431px;
+      height: 431px;
+      margin-bottom: 3rem;
+    }
+    svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    circle.bg {
+      fill: none;
+      stroke: #eee;
+      stroke-width: 17;
+    }
+    circle.fg {
+      fill: none;
+      stroke: #000;
+      stroke-width: 17;
+      stroke-linecap: round;
+      stroke-dasharray: 1264.5;
+      stroke-dashoffset: 1264.5;
+    }
+    #display {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 6.47rem;
+    }
+    .buttons {
+      display: flex;
+      gap: 2rem; /* increased spacing between buttons */
+    }
+    button {
+      font-size: 2.16rem;
+      padding: 0.72rem 1.44rem;
+      background: #fff;
+      color: #000;
+      border: 2px solid #000;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    #pauseBtn,
+    #cancelBtn {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="timer-container">
+    <svg>
+      <circle class="bg" cx="215.5" cy="215.5" r="201.5"></circle>
+      <circle id="ring" class="fg" cx="215.5" cy="215.5" r="201.5"></circle>
+    </svg>
+    <div id="display">00:00</div>
+  </div>
+
+  <div class="buttons" id="controls">
+    <button id="btn25" onclick="startTimer(25)">25 Min</button>
+    <button id="btn50" onclick="startTimer(50)">50 Min</button>
+    <button id="pauseBtn" onclick="togglePause()">Pause</button>
+    <button id="cancelBtn" onclick="cancelTimer()">Cancel</button>
+  </div>
+
+  <script>
+    let intervalId;
+    let remainingSec = 0;
+    let totalSec = 0;
+    let isPaused = false;
+    const ring = document.getElementById('ring');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const start25 = document.getElementById('btn25');
+    const start50 = document.getElementById('btn50');
+    const totalLength = 2 * Math.PI * 201.5;
+
+    function startTimer(minutes) {
+      clearInterval(intervalId);
+      isPaused = false;
+      totalSec = minutes * 60;
+      remainingSec = totalSec;
+      updateDisplay(remainingSec);
+      updateRing(remainingSec);
+
+      start25.style.display = 'none';
+      start50.style.display = 'none';
+      pauseBtn.style.display = 'inline-block';
+      cancelBtn.style.display = 'inline-block';
+      pauseBtn.textContent = 'Pause';
+
+      intervalId = setInterval(tick, 1000);
+    }
+
+    function tick() {
+      if (isPaused) return;
+      remainingSec--;
+      updateDisplay(remainingSec);
+      if (remainingSec === totalSec || remainingSec % 60 === 0) {
+        updateRing(remainingSec);
+      }
+      if (remainingSec <= 0) {
+        clearInterval(intervalId);
+        resetControls();
+      }
+    }
+
+    function togglePause() {
+      isPaused = !isPaused;
+      pauseBtn.textContent = isPaused ? 'Resume' : 'Pause';
+    }
+
+    function cancelTimer() {
+      clearInterval(intervalId);
+      resetControls();
+    }
+
+    function resetControls() {
+      pauseBtn.style.display = 'none';
+      cancelBtn.style.display = 'none';
+      start25.style.display = 'inline-block';
+      start50.style.display = 'inline-block';
+      updateDisplay(0);
+      ring.style.strokeDashoffset = totalLength;
+    }
+
+    function updateDisplay(sec) {
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      document.getElementById('display').textContent = `${m}:${s}`;
+    }
+
+    function updateRing(sec) {
+      ring.style.strokeDashoffset = totalLength * (1 - sec / totalSec);
+    }
+
+    ring.style.strokeDasharray = totalLength;
+    ring.style.strokeDashoffset = totalLength;
+  </script>
+
+</body>
+</html>
