@@ -13,4 +13,4 @@ I've intentionally given only two timer option because anything less than 25 min
 It doesn't work.
 
 # How do I use it?
-Open your browser in kindle and go to .
+Open your browser in kindle and go to `jim8pu.github.io/Kindle-Clock.-/`.
